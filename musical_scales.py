@@ -1,43 +1,40 @@
 class MusicalScales():
     """
-        Musical Scale class to generate and load music scales.
-        Parameters:
-        - `type`: `['cromatic_ascending'|'cromatic_descending'|'diatonic']`
+        Musical Scale class to generate scales and the graph of cromatic scale
+        (ascending and descending).
+        TODO: Implement generation for minor scale.
     """
-
-    # Setup scales details
-    # major_scale_tones = (0, 1., 2., 2.5, 3.5, 4.5, 5.5, 6.)
-    # minor_scale_tones = (0, 1., 1.5, 2.5, 3.5, 4.5, 5., 6.)
 
     def __init__(self) -> None:
 
-        self.major_scale_degree_tones = {
-            # degree: tones,
-            0: 0,    # Tonic
-            1: 1.,   # 2nd degree
-            2: 2.,   # 3rd
-            3: 2.5,  # 4th
-            4: 3.5,  # 5th
-            5: 4.5,  # 6th
-            6: 5.5,  # 7th
-            # 7: 6.    # 8th - restart from begin
-        }
-        self.minor_scale_degree_tones = (0, 1., 1.5, 2.5, 3.5, 4.5, 5., 6.)
+        self.major_scale_intervals = [
+            # distance (intervals) between each degree,
+            # Starts in the 2nd degree, Tonic is 0
+            0,  # Tonic
+            2,  # 2nd degree
+            2,  # 3rd
+            1,  # 4th
+            2,  # 5th
+            2,  # 6th
+            2,  # 7th
+            # 1,  # 8th - restart from tonic
+        ]
+        self.minor_scale_degree_tones = [2, 1, 2, 2, 2, 1, 2]  # Starts in the 2nd degree, Tonic = 0
 
         self.cromatic_scale_ascending = [
-            'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'B#']  # len: 12
+            'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']  # len: 12
 
         self.cromatic_scale_descending = [
-            'C', 'Cb', 'D', 'Db', 'E', 'F', 'Fb', 'G', 'Gb', 'A', 'Ab', 'B', 'Bb']
+            'B', 'A#', 'A', 'G#', 'G', 'F#', 'F', 'E', 'D#', 'D', 'C#', 'C']  # len: 12
 
-    def _generate_cromatic_graph(self, type: str):
-        cromatic_graph = {}
+    def generate_cromatic_graph(self, scale: str, tonic_note: str):
+        cromatic_graph = self.generate_scale(self, tonic_note, scale)
         if type == 'major':
             for note in self.cromatic_scale_ascending:
                 # create a dict of dict for each note in ascending scale.
-                cromatic_graph[note] = {}
+                cromatic_graph[note] = self._generate_scale()
 
-        elif type == 'minor':
+        else:  # 'minor'
             for note in self.cromatic_scale_descending:
                 # create a dict of dict for each note in ascending scale.
                 cromatic_graph[note] = {}
@@ -45,9 +42,35 @@ class MusicalScales():
         return cromatic_graph
 
     def generate_scale(self, tonic_note: str = 'C#', scale: str = 'major'):
-        cromatic_scale = {}
+        base_index = self.cromatic_scale_ascending.index(tonic_note)  # base_index = 2
 
-        return cromatic_scale
+        # Generate the scale from Tonic note.
+        major_scale = {
+            tonic_note: 0,  # Set the tonic note and it interval value as the first.
+        }
+        current_index = base_index
+
+        # For each interval in the major scale intervals list
+        for interval in self.major_scale_intervals:
+
+            # Select the next note in cromatic scale, by the index in current position in
+            # `cromatic_scale_ascending` list.
+            # We setted the `current_index` as the base_index that is the tonic note,
+            # Then, we select the next note in cromatic scale by sum of actual_note + interval
+            # that is in `major_scale_intervals` list.
+            # `% len` is to garantee that the next index is a valid index inside
+            # `cromatic_scale_ascending` and returns to the begin of the list, if the index was
+            # the last in the list.
+            current_index = (current_index + interval) % len(self.cromatic_scale_ascending)
+
+            # Select the note in ascending cromatic scale, by it's index
+            note = self.cromatic_scale_ascending[current_index]
+
+            # Add to Dict, the note and it's interval value
+            major_scale[note] = interval
+            print(major_scale)
+
+        return major_scale
 
 
 class MajorCromaticScale():
@@ -70,116 +93,17 @@ class MajorCromaticScale():
             'G': 3.5,
             'A': 4.5,
             'B': 5.5,
-            # 'C': 6.,  # Octave
+            # 'C#': 6.,  # Octave
         },
-        'D': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        },
-        'D#': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        },
-        'E': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        },
-        'F': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        },
-        'F#': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        },
-        'G': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        },
-        'G#': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        },
-        'A': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        },
-        'A#': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        },
-        'B': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        },
-        'B#': {
-            'C': 0.,  # Tonic
-            'D': 1.,
-            'E': 2.,
-            'F': 2.5,
-            'G': 3.5,
-            'A': 4.5,
-            'B': 5.5,
-            'C': 6.,  # Octave
-        }
+        'D': {},
+        'D#': {},
+        'E': {},
+        'F': {},
+        'F#': {},
+        'G': {},
+        'G#': {},
+        'A': {},
+        'A#': {},
+        'B': {},
+        'B#': {}
     }
